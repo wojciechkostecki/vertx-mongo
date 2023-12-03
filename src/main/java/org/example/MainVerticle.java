@@ -9,12 +9,10 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.handler.JWTAuthHandler;
-import org.example.handler.CreateItemHandler;
-import org.example.handler.GetItemsHandler;
 import org.example.handler.LoginHandler;
 import org.example.handler.MongoDBHandler;
 import org.example.handler.RegisterHandler;
+import org.example.router.ItemRouter;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -36,12 +34,11 @@ public class MainVerticle extends AbstractVerticle {
 
         router.route().handler(BodyHandler.create());
 
-        router.route("/items").handler(JWTAuthHandler.create(jwtAuth));
-
         router.post("/login").handler(new LoginHandler(jwtAuth, mongoClient));
         router.post("/register").handler(new RegisterHandler(mongoClient));
-        router.post("/items").handler(new CreateItemHandler(jwtAuth, mongoClient));
-        router.get("/items").handler(new GetItemsHandler(jwtAuth, mongoClient));
+
+        ItemRouter itemRouter = new ItemRouter(router, jwtAuth, mongoClient);
+        itemRouter.buildItemRouter();
 
         server.requestHandler(router).listen(3000);
     }
