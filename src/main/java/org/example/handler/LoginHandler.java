@@ -33,7 +33,8 @@ public class LoginHandler implements Handler<RoutingContext> {
                     String hashedPassword = user.getString("password");
 
                     if (BCrypt.checkpw(password, hashedPassword)) {
-                        String token = jwtAuth.generateToken(new JsonObject().put("login", login));
+                        String token = jwtAuth.generateToken(new JsonObject().put("login", login)
+                                .put("user_id", user.getValue("_id")));
 
                         routingContext.response().setStatusCode(200).end(new JsonObject().put("token", token).encode());
                     } else {
